@@ -10,7 +10,7 @@ var Button = registerPlugin2("Button", {
   web: () => import("./web-6I5KWONF.js").then((m) => new m.ButtonWeb())
 });
 export {
-  Button as LiquidButton,
+  Button,
   TabsBar
 };
 //# sourceMappingURL=index.js.map

@@ -13,9 +13,9 @@ export type {
   BadgeValue
 } from "./components/tabs/definitions";
 
-export { Button as LiquidButton } from "./components/button";
+export { Button } from "./components/button";
 export type {
-  ButtonPlugin as LiquidButtonPlugin,
-  ButtonOptions as LiquidButtonOptions,
-  ButtonFrame as LiquidButtonFrame
+  ButtonPlugin,
+  ButtonOptions,
+  ButtonFrame
 } from "./components/button/definitions";

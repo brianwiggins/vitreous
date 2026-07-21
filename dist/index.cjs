@@ -287,7 +287,7 @@ var init_web2 = __esm({
 // src/index.ts
 var index_exports = {};
 __export(index_exports, {
-  LiquidButton: () => Button,
+  Button: () => Button,
   TabsBar: () => TabsBar
 });
 module.exports = __toCommonJS(index_exports);
@@ -305,7 +305,7 @@ var Button = (0, import_core4.registerPlugin)("Button", {
 });
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  LiquidButton,
+  Button,
   TabsBar
 });
 //# sourceMappingURL=index.cjs.map

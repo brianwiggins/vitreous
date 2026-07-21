@@ -118,4 +118,4 @@ interface ButtonPlugin {
 
 declare const Button: ButtonPlugin;
 
-export { type BadgeValue, Button as LiquidButton, type ButtonFrame as LiquidButtonFrame, type ButtonOptions as LiquidButtonOptions, type ButtonPlugin as LiquidButtonPlugin, type SafeAreaInsets, type SelectOptions, type SetBadgeOptions, type TabItem, TabsBar, type TabsBarConfigureOptions, type TabsBarPlugin };
+export { type BadgeValue, Button, type ButtonFrame, type ButtonOptions, type ButtonPlugin, type SafeAreaInsets, type SelectOptions, type SetBadgeOptions, type TabItem, TabsBar, type TabsBarConfigureOptions, type TabsBarPlugin };
