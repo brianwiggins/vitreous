@@ -1,5 +1,5 @@
 {
-  "name": "stay-liquid",
+  "name": "vitreous",
   "version": "0.1.0",
   "description": "Native Liquid Glass for Ionic & Capacitor Applications.",
   "license": "MIT",
@@ -11,7 +11,7 @@
     "dist",
     "ios",
     "src",
-    "StayLiquid.podspec",
+    "Vitreous.podspec",
     "README.md"
   ],
   "exports": {

@@ -1,9 +1,9 @@
 Pod::Spec.new do |s|
-  s.name             = 'StayLiquid'
+  s.name             = 'Vitreous'
   s.version          = '0.1.0'
   s.summary          = 'Native Liquid Glass for Ionic & Capacitor Applications'
   s.license          = { :type => 'MIT' }
-  s.homepage         = 'https://github.com/alistairheath/stay-liquid'
+  s.homepage         = 'https://github.com/brianwiggins/vitreous'
   s.author           = { 'Hapcha' => 'team@hapcha.com' }
   s.source           = { :path => '.' }
   s.source_files     = 'ios/Plugin/**/*.{swift,m,h}'
