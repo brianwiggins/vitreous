@@ -118,7 +118,7 @@ final class ButtonView: UIView {
         addGestureRecognizer(tap)
     }
 
-    func apply(options: LiquidButtonOptions) {
+    func apply(options: ButtonOptions) {
         frame = options.frame
         effectView.layer.cornerRadius = bounds.height / 2
 
