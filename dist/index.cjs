@@ -257,9 +257,37 @@ var init_web = __esm({
   }
 });
 
+// src/components/button/web.ts
+var web_exports2 = {};
+__export(web_exports2, {
+  ButtonWeb: () => ButtonWeb
+});
+var import_core3, ButtonWeb;
+var init_web2 = __esm({
+  "src/components/button/web.ts"() {
+    "use strict";
+    import_core3 = require("@capacitor/core");
+    ButtonWeb = class extends import_core3.WebPlugin {
+      async show(options) {
+        console.log("LiquidButton: show()", options);
+      }
+      async update(options) {
+        console.log("LiquidButton: update()", options);
+      }
+      async hide(options) {
+        console.log("LiquidButton: hide()", options.id);
+      }
+      async remove(options) {
+        console.log("LiquidButton: remove()", options.id);
+      }
+    };
+  }
+});
+
 // src/index.ts
 var index_exports = {};
 __export(index_exports, {
+  LiquidButton: () => Button,
   TabsBar: () => TabsBar
 });
 module.exports = __toCommonJS(index_exports);
@@ -269,8 +297,15 @@ var import_core2 = require("@capacitor/core");
 var TabsBar = (0, import_core2.registerPlugin)("TabsBar", {
   web: () => Promise.resolve().then(() => (init_web(), web_exports)).then((m) => new m.TabsBarWeb())
 });
+
+// src/components/button/index.ts
+var import_core4 = require("@capacitor/core");
+var Button = (0, import_core4.registerPlugin)("Button", {
+  web: () => Promise.resolve().then(() => (init_web2(), web_exports2)).then((m) => new m.ButtonWeb())
+});
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
+  LiquidButton,
   TabsBar
 });
 //# sourceMappingURL=index.cjs.map
