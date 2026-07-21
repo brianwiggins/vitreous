@@ -1,3 +1,5 @@
+import { PluginListenerHandle } from '@capacitor/core';
+
 type BadgeValue = number | "dot" | null;
 /** Shape options for image icon containers */
 type ImageIconShape = "circle" | "square";
@@ -69,9 +71,7 @@ interface TabsBarPlugin {
     /** Fires when user taps a tab */
     addListener(eventName: "selected", listenerFunc: (ev: {
         id: string;
-    }) => void): Promise<{
-        remove: () => void;
-    }>;
+    }) => void): Promise<PluginListenerHandle>;
 }
 
 /** Named export for the TabsBar plugin within the larger library */
@@ -111,9 +111,7 @@ interface ButtonPlugin {
     /** Fires when the user taps a button */
     addListener(eventName: 'tapped', listenerFunc: (ev: {
         id: string;
-    }) => void): Promise<{
-        remove: () => void;
-    }>;
+    }) => void): Promise<PluginListenerHandle>;
 }
 
 declare const Button: ButtonPlugin;

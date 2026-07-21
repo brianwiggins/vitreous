@@ -1,3 +1,5 @@
+import type { PluginListenerHandle } from '@capacitor/core';
+
 export type BadgeValue = number | "dot" | null;
 
 /** Shape options for image icon containers */
@@ -81,5 +83,5 @@ export interface TabsBarPlugin {
   addListener(
     eventName: "selected",
     listenerFunc: (ev: { id: string }) => void
-  ): Promise<{ remove: () => void }>;
+  ): Promise<PluginListenerHandle>;
 }

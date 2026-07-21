@@ -1,3 +1,5 @@
+import type { PluginListenerHandle } from '@capacitor/core';
+
 export interface ButtonFrame {
   /** X position in CSS pixels (from getBoundingClientRect) */
   x: number;
@@ -32,5 +34,5 @@ export interface ButtonPlugin {
   addListener(
     eventName: 'tapped',
     listenerFunc: (ev: { id: string }) => void
-  ): Promise<{ remove: () => void }>;
+  ): Promise<PluginListenerHandle>;
 }
