@@ -226,7 +226,7 @@ await Button.addListener('tapped', ({ id }) => {
 ```
 
 ### Update position
-
+Call `update` whenever the button moves -- on scroll, layout changes, or keyboard appearance. `update` is a no-op while the button is hidden, so mid-animation coordinate changes will not cause the button to flash at a wrong position.
 Call `update` whenever the button moves -- on scroll, layout changes, or keyboard appearance:
 
 ```tsx
@@ -238,6 +238,9 @@ window.addEventListener('scroll', async () => {
   });
 });
 ```
+
+Call `update` with the correct coordinates before `show` if you need to reposition a hidden button before making it visible again.
+
 
 ### Hide and remove
 
@@ -337,177 +340,3 @@ await TabsBar.configure({
 **Fallback chain:** `imageIcon` -> `systemIcon` (SF Symbol) -> `image` (bundled asset) -> empty placeholder
 
 Remote images are cached for 24 hours. Loading is asynchronous -- the `systemIcon` fallback displays until the image is ready.
-
-## Buttons
-
-`Button` renders a native Liquid Glass button on top of the WKWebView at coordinates you provide. Only buttons you explicitly register are affected -- nothing in your project changes automatically.
-
-### Import
-
-```tsx
-import { Button } from 'vitreous';
-```
-
-### Show a button
-
-Enforce a minimum 44×44pt frame (the iOS HIG minimum touch target) centered on the element. Passing a smaller frame produces a visually squeezed button with an off-center icon.
-
-```tsx
-function frameFor(el: HTMLElement) {
-  const MIN = 44;
-  const rect = el.getBoundingClientRect();
-  const w = Math.max(rect.width, MIN);
-  const h = Math.max(rect.height, MIN);
-  return {
-    x: rect.x - (w - rect.width) / 2,
-    y: rect.y - (h - rect.height) / 2,
-    width: w,
-    height: h,
-  };
-}
-
-const el = document.getElementById('my-button')!;
-
-await Button.show({
-  id: 'my-button',
-  systemIcon: 'plus',
-  iconColor: '#007AFF', // optional SF Symbol tint color
-  frame: frameFor(el)
-});
-
-// Hide the underlying web button so only the native one is visible
-el.style.visibility = 'hidden';
-```
-
-> Use SF Symbol names for `systemIcon`. Custom image icons are not recommended -- the Liquid Glass compositing effect heavily obscures custom imagery.
-
-#### Unique IDs for multiple instances
-
-If the same component is mounted more than once simultaneously (e.g. in an Ionic tab layout where multiple pages are kept alive), use a unique ID per instance to avoid conflicts:
-
-```tsx
-private static counter = 0;
-private readonly buttonId = `my-button-${++MyComponent.counter}`;
-```
-
-### Listen for taps
-
-Store the returned handle so you can remove the listener on cleanup:
-
-```tsx
-private tapListener?: PluginListenerHandle;
-
-this.tapListener = await Button.addListener('tapped', ({ id }) => {
-  if (id === 'my-button') {
-    // handle tap
-  }
-});
-```
-
-### Update position
-
-Call `update` whenever the button moves -- on scroll, layout changes, or keyboard appearance:
-
-```tsx
-window.addEventListener('scroll', async () => {
-  const rect = el.getBoundingClientRect();
-  await Button.update({
-    id: 'my-button',
-    frame: { x: rect.x, y: rect.y, width: rect.width, height: rect.height }
-  });
-});
-```
-
-### Hide and remove
-
-Always restore `el.style.visibility` when hiding or removing the native button, so the web element can serve as a fallback:
-
-```tsx
-await Button.hide({ id: 'my-button' });   // hides, keeps registered
-el.style.visibility = 'visible';
-
-await Button.remove({ id: 'my-button' }); // removes entirely
-el.style.visibility = 'visible';
-```
-
-### Ionic page lifecycle
-
-Ionic keeps multiple pages alive simultaneously and animates between them. The native button overlay does not participate in these animations, so you must hide it when your page leaves and re-show it when it returns. Read the coordinates **after** the animation has settled, not mid-transition.
-
-```tsx
-private intersectionObserver?: IntersectionObserver;
-private navSub?: Subscription;
-
-async ngAfterViewInit() {
-  // ... show button and hide web element as above ...
-
-  // Hide immediately when the page leaves the viewport (tab switch, forward nav)
-  this.intersectionObserver = new IntersectionObserver((entries) => {
-    for (const entry of entries) {
-      if (!entry.isIntersecting) {
-        void Button.hide({ id: this.buttonId }).catch(() => {});
-        el.style.visibility = 'visible';
-      }
-    }
-  }, { threshold: 0 });
-  this.intersectionObserver.observe(el);
-
-  // Re-show after navigation settles (~400 ms covers Ionic's default transition)
-  this.navSub = this.router.events
-    .pipe(filter(e => e instanceof NavigationEnd))
-    .subscribe(() => {
-      setTimeout(async () => {
-        if (!isOnScreen(el)) return; // skip inactive tab instances
-        try {
-          await Button.show({ id: this.buttonId, systemIcon: 'plus', frame: frameFor(el) });
-          el.style.visibility = 'hidden';
-        } catch {
-          el.style.visibility = 'visible'; // fallback if show fails
-        }
-      }, 400);
-    });
-}
-
-function isOnScreen(el: HTMLElement): boolean {
-  if (el.offsetParent === null) return false;
-  const rect = el.getBoundingClientRect();
-  return (
-    rect.width > 0 &&
-    rect.x + rect.width > 0 && rect.x < window.innerWidth &&
-    rect.y + rect.height > 0 && rect.y < window.innerHeight
-  );
-}
-
-async ngOnDestroy() {
-  this.navSub?.unsubscribe();
-  this.intersectionObserver?.disconnect();
-  await this.tapListener?.remove();
-  await Button.remove({ id: this.buttonId }).catch(() => {});
-  el.style.visibility = 'visible';
-}
-```
-
-### API reference
-
-```tsx
-interface ButtonOptions {
-  id: string;           // unique identifier
-  label?: string;       // button text
-  systemIcon?: string;  // SF Symbol name (e.g. 'plus', 'heart.fill')
-  iconColor?: string;   // SF Symbol tint color (hex or rgba)
-  frame: {
-    x: number;          // CSS pixels from getBoundingClientRect
-    y: number;
-    width: number;
-    height: number;     // minimum 44×44 recommended
-  };
-}
-```
-
-> iOS 26+ uses `UIGlassEffect` for the authentic Liquid Glass appearance. On older iOS versions the button falls back to a `UIBlurEffect` background.
-
-## Roadmap & Contributing
-
-Vitreous is actively extending the original stay-liquid proof-of-concept. More native Liquid Glass components are planned.
-
-Feel free to report bugs, open discussions, or submit pull requests.

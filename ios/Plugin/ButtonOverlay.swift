@@ -42,6 +42,7 @@ final class ButtonManager: UIViewController {
             show(options: options)
             return
         }
+        guard !btn.isHidden else { return }
         btn.apply(options: options)
     }
 
