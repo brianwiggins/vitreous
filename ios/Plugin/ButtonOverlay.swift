@@ -40,8 +40,9 @@ final class ButtonManager: UIViewController {
     }
 
     func show(options: ButtonOptions) {
-        guard buttons[options.id] == nil else {
-            update(options: options)
+        if let existing = buttons[options.id] {
+            existing.isHidden = false
+            existing.apply(options: options)
             return
         }
         let btn = ButtonView(options: options)
