@@ -181,7 +181,7 @@ export class TabsBarWeb extends WebPlugin implements TabsBarPlugin {
     // Validate and preload images
     await this.validateAndPreloadImages(options.items);
     
-    // Web implementation — no-op on non-iOS platforms
+    // Web implementation: validate inputs and preload images only (no native UI on web)
   }
   
   private async validateAndPreloadImages(items: TabItem[]): Promise<void> {
