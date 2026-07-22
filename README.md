@@ -27,6 +27,7 @@ ionic cap sync ios
 ### Import
 
 ```tsx
+import type { PluginListenerHandle } from '@capacitor/core';
 import { Device, DeviceInfo } from '@capacitor/device';
 import { TabsBar } from 'vitreous';
 import { filter, Subscription } from 'rxjs';
