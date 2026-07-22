@@ -214,8 +214,7 @@ export class TabsBarWeb extends WebPlugin implements TabsBarPlugin {
         console.warn(`TabsBar: Failed to load image for tab ${id}:`, error.message);
         
         // Fallback to system icon if available
-        if (item.systemIcon) {
-        } else {
+        if (!item.systemIcon) {
           console.warn(`TabsBar: No fallback available for tab ${id}`);
         }
       })
