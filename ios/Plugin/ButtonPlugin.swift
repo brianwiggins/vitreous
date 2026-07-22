@@ -88,6 +88,7 @@ public class ButtonPlugin: CAPPlugin {
             id: id,
             label: call.getString("label"),
             systemIcon: call.getString("systemIcon"),
+            iconColor: ColorUtils.parseColor(call.getString("iconColor")),
             frame: CGRect(x: x, y: y, width: w, height: h)
         )
     }

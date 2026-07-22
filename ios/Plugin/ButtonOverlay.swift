@@ -4,6 +4,8 @@ struct ButtonOptions {
     let id: String
     let label: String?
     let systemIcon: String?
+    /// Tint color for the SF Symbol icon
+    let iconColor: UIColor?
     /// Frame in CSS pixels / UIKit points (1:1 in WKWebView)
     let frame: CGRect
 }
@@ -126,6 +128,7 @@ final class ButtonView: UIView {
         if let iconName = options.systemIcon,
            let image = UIImage(systemName: iconName) {
             iconView.image = image
+            iconView.tintColor = options.iconColor ?? .label
             if iconView.superview == nil { stack.addArrangedSubview(iconView) }
         } else {
             iconView.removeFromSuperview()

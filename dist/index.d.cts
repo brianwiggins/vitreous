@@ -92,6 +92,8 @@ interface ButtonOptions {
     label?: string;
     /** SF Symbol name (e.g. 'plus', 'heart.fill') */
     systemIcon?: string;
+    /** Tint color for the SF Symbol icon (hex or RGBA format) */
+    iconColor?: string;
     /** Position and size in CSS pixels */
     frame: ButtonFrame;
 }
