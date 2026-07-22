@@ -10,6 +10,17 @@ struct ButtonOptions {
     let frame: CGRect
 }
 
+// MARK: - Pass-through container view
+
+/// A transparent full-screen view that only consumes touches landing on a subview.
+/// Touches on the clear background pass through to the WKWebView beneath.
+private final class PassThroughView: UIView {
+    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        let hit = super.hitTest(point, with: event)
+        return hit == self ? nil : hit
+    }
+}
+
 // MARK: - Manager
 
 final class ButtonManager: UIViewController {
@@ -17,6 +28,10 @@ final class ButtonManager: UIViewController {
     var onTapped: ((String) -> Void)?
 
     private var buttons: [String: ButtonView] = [:]
+
+    override func loadView() {
+        view = PassThroughView()
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
