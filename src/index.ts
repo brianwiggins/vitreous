@@ -13,9 +13,10 @@ export type {
   BadgeValue
 } from "./components/tabs/definitions";
 
-export { Button } from "./components/button";
+export { Button, frameFromElement } from "./components/button";
 export type {
   ButtonPlugin,
   ButtonOptions,
+  ButtonUpdateOptions,
   ButtonFrame
 } from "./components/button/definitions";

@@ -13,4 +13,4 @@ var ButtonWeb = class extends WebPlugin {
 export {
   ButtonWeb
 };
-//# sourceMappingURL=web-RX3AWSMS.js.map
+//# sourceMappingURL=web-4PNBI5DC.js.map

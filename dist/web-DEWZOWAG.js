@@ -168,8 +168,7 @@ var TabsBarWeb = class extends WebPlugin {
     }).catch((error) => {
       this.loadingStates.set(id, "error");
       console.warn(`TabsBar: Failed to load image for tab ${id}:`, error.message);
-      if (item.systemIcon) {
-      } else {
+      if (!item.systemIcon) {
         console.warn(`TabsBar: No fallback available for tab ${id}`);
       }
     }).finally(() => {
@@ -210,4 +209,4 @@ var TabsBarWeb = class extends WebPlugin {
 export {
   TabsBarWeb
 };
-//# sourceMappingURL=web-SI4KTUU7.js.map
+//# sourceMappingURL=web-DEWZOWAG.js.map

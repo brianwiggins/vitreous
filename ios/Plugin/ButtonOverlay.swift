@@ -10,6 +10,15 @@ struct ButtonOptions {
     let frame: CGRect
 }
 
+/// Used by update() -- frame is optional so callers can update only visual properties
+struct ButtonUpdateOptions {
+    let id: String
+    let label: String?
+    let systemIcon: String?
+    let iconColor: UIColor?
+    let frame: CGRect?
+}
+
 // MARK: - Pass-through container view
 
 /// A transparent full-screen view that only consumes touches landing on a subview.
@@ -53,13 +62,13 @@ final class ButtonManager: UIViewController {
         buttons[options.id] = btn
     }
 
-    func update(options: ButtonOptions) {
+    func update(options: ButtonUpdateOptions) {
         guard let btn = buttons[options.id] else {
-            show(options: options)
+            print("[Vitreous] Warning: update() called for unknown button id '\(options.id)'")
             return
         }
         guard !btn.isHidden else { return }
-        btn.apply(options: options)
+        btn.applyUpdate(options: options)
     }
 
     func hide(id: String) {
@@ -163,6 +172,31 @@ final class ButtonView: UIView {
             titleLabel.removeFromSuperview()
         }
     }
+
+    /// Partial update: only touches the properties that are provided.
+    func applyUpdate(options: ButtonUpdateOptions) {
+        if let frame = options.frame {
+            self.frame = frame
+            effectView.layer.cornerRadius = bounds.height / 2
+        }
+        if let iconName = options.systemIcon {
+            let config: UIImage.SymbolConfiguration
+            if let color = options.iconColor {
+                config = UIImage.SymbolConfiguration(hierarchicalColor: color)
+            } else {
+                config = UIImage.SymbolConfiguration(scale: .medium)
+            }
+            iconView.image = UIImage(systemName: iconName, withConfiguration: config)
+            if iconView.superview == nil { stack.addArrangedSubview(iconView) }
+        }
+        if let text = options.label {
+            if text.isEmpty {
+                titleLabel.removeFromSuperview()
+            } else {
+                titleLabel.text = text
+                if titleLabel.superview == nil { stack.addArrangedSubview(titleLabel) }
+            }
+        }
 
     @objc private func tapped() {
         onTap?()

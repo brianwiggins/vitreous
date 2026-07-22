@@ -177,14 +177,18 @@ Remote images are cached for 24 hours. Loading is asynchronous -- the `systemIco
 
 ---
 
+
 ## Buttons
 
 `Button` renders a native Liquid Glass button on top of the WKWebView at coordinates you provide. Only buttons you explicitly register are affected -- nothing in your project changes automatically.
 
+> iOS 26+ uses `UIGlassEffect` for the authentic Liquid Glass appearance. On older iOS versions the button falls back to a `UIBlurEffect` background.
+
 ### Import
 
 ```tsx
-import { Button } from 'vitreous';
+import { Button, frameFromElement } from 'vitreous';
+import type { PluginListenerHandle } from '@capacitor/core';
 ```
 
 ### Show a button
@@ -206,55 +210,49 @@ function frameFor(el: HTMLElement) {
 }
 
 const el = document.getElementById('my-button')!;
-
 await Button.show({
   id: 'my-button',
+  element: el,
+  minSize: 44,          // minimum size in CSS px (default: 44)
   systemIcon: 'plus',
   iconColor: '#007AFF',
-  frame: frameFor(el)
 });
 
-// Use opacity rather than visibility to hide the web element.
-// A child rule of `visibility: visible !important` can override `visibility: hidden`
-// on a parent, but opacity cascades through the stacking context and cannot be overridden.
-el.style.opacity = '0';
-el.style.pointerEvents = 'none';
+// Or with an explicit frame
+await Button.show({
+  id: 'my-button',
+  frame: { x: 20, y: 60, width: 44, height: 44 },
+  systemIcon: 'plus',
+  iconColor: '#007AFF',
+});
+
+// Hide the underlying web element so only the native button is visible
+el.style.visibility = 'hidden';
 ```
 
-> Use SF Symbol names for `systemIcon`. Custom image icons are not recommended -- the Liquid Glass compositing effect heavily obscures custom imagery.
-
-#### Unique IDs for multiple instances
-
-If the same component is mounted more than once simultaneously (e.g. in an Ionic tab layout where multiple pages are kept alive), use a unique ID per instance to avoid conflicts:
-
-```tsx
-private static counter = 0;
-private readonly buttonId = `my-button-${++MyComponent.counter}`;
-```
+The button shape follows the frame. A square frame produces a circle; a wider frame (e.g. 140x44) produces a pill.
 
 ### Listen for taps
 
 Store the returned handle so you can clean up on destroy:
 
 ```tsx
-private buttonListener?: PluginListenerHandle;
+private tapHandle?: PluginListenerHandle;
 
 async ngOnInit() {
-  this.buttonListener = await Button.addListener('tapped', ({ id }) => {
-    if (id === 'my-button') {
-      // handle tap
-    }
+  this.tapHandle = await Button.addListener('tapped', ({ id }) => {
+    if (id === 'my-button') { /* handle tap */ }
   });
 }
 
 async ngOnDestroy() {
-  await this.buttonListener?.remove();
+  await this.tapHandle?.remove();
 }
 ```
 
-### Update position
+### Update
 
-Call `update` whenever the button moves -- on scroll, layout changes, or keyboard appearance. `update` is a no-op while the button is hidden, so mid-animation coordinate changes will not cause a hidden button to flash at wrong coordinates.
+All fields except `id` are optional. Omit `frame` to update only visual properties without moving the button:
 
 ```tsx
 window.addEventListener('scroll', async () => {
@@ -262,69 +260,29 @@ window.addEventListener('scroll', async () => {
 }, { passive: true });
 ```
 
-Call `update` with correct coordinates before calling `show` if you need to reposition a hidden button before making it visible again.
+`update` is a no-op while the button is hidden. To reposition a hidden button, call `show` again with the new frame (or element) instead of `update`.
 
 ### Hide and remove
 
-Restore the web element's visibility whenever the native button is hidden or removed, so the web element can serve as a fallback:
-
 ```tsx
 await Button.hide({ id: 'my-button' });   // hides, keeps registered
-el.style.opacity = '';
-el.style.pointerEvents = '';
-
 await Button.remove({ id: 'my-button' }); // removes entirely
-el.style.opacity = '';
-el.style.pointerEvents = '';
 ```
 
-### Ionic page lifecycle
+Calling `show` on a hidden button re-shows it with the provided frame and options.
 
-Ionic keeps multiple pages alive simultaneously and animates between them. If a button is managed inside a shared component used across many pages, a per-instance approach quickly becomes unworkable: multiple instances race to show, hide, and remove the same button ID, and `getBoundingClientRect()` called mid-animation returns wrong coordinates.
+### frameFromElement utility
 
-The recommended approach for apps with many pages is a root-scoped singleton service that owns exactly one native button for the app's lifetime.
+`frameFromElement` computes a `ButtonFrame` from a DOM element. Useful when you need to cache the frame or compute it manually:
 
 ```tsx
-// glass-button.service.ts
-@Injectable({ providedIn: 'root' })
-export class GlassButtonService {
-  private initialized = false;
-  private ios26 = false;
-  private cachedFrame?: ButtonFrame;
-  private readonly webElements = new Set<HTMLElement>();
+import { frameFromElement } from 'vitreous';
 
-  constructor(private router: Router, private navCtrl: NavController) {}
+// Preserve element aspect ratio (pill stays pill)
+const frame = frameFromElement(el, 44);
 
-  async initOnce(): Promise<void> {
-    if (this.initialized) return;
-    this.initialized = true;
-
-    const info = await Device.getInfo();
-    if (info.platform !== 'ios' || !info.iOSVersion || info.iOSVersion < 260000) return;
-
-    this.ios26 = true;
-
-    // Hide any elements that attached before Device.getInfo() resolved.
-    for (const el of this.webElements) this.hideWebEl(el);
-
-    await new Promise<void>(r => setTimeout(r, 150)); // let layout settle
-
-    if (!this.isHiddenRoute(this.router.url)) await this.showButton();
-
-    this.router.events
-      .pipe(filter(e => e instanceof NavigationEnd))
-      .subscribe(async (e) => {
-        const url = (e as NavigationEnd).urlAfterRedirects;
-        if (this.isHiddenRoute(url)) {
-          await Button.hide({ id: 'my-singleton-button' }).catch(() => {});
-        } else {
-          await this.showButton();
-        }
-      });
-
-    await Button.addListener('tapped', ({ id }) => {
-      if (id === 'my-singleton-button') { /* handle tap */ }
-    });
+// Force a square/circle (uses max of width, height, minSize for both dimensions)
+const squareFrame = frameFromElement(el, 44, true);
 
     window.addEventListener('resize', () => void this.showButton());
   }
@@ -378,43 +336,14 @@ export class GlassButtonService {
 }
 ```
 
-Each page component then just calls `attach`/`detach`:
-
-```tsx
-export class MyPageComponent implements AfterViewInit, OnDestroy {
-  private el: HTMLElement | null = null;
-
-  constructor(
-    private elementRef: ElementRef<HTMLElement>,
-    private glassButton: GlassButtonService,
-  ) {}
-
-  ngAfterViewInit() {
-    this.el = this.elementRef.nativeElement.querySelector('.my-button');
-    if (this.el) this.glassButton.attach(this.el);
-    void this.glassButton.initOnce();
-  }
-
-  ngOnDestroy() {
-    if (this.el) this.glassButton.detach(this.el);
-  }
-}
-```
-
-Key properties of this pattern:
-
-- `Button.show` is called with settled coordinates -- never mid-animation
-- `Button.update` is never needed (the button re-shows with fresh coordinates on each navigation)
-- The button hides automatically when no pages with the component are active
-- Route-based filtering keeps the button off pre-auth and incompatible pages
-- `isHiddenRoute` is the single place to add new exclusions
+The frame is centered over the element. `minSize` applies independently to width and height, so a pill element stays pill-shaped unless `forceSquare` is set.
 
 ### API reference
 
 ```tsx
 interface ButtonOptions {
-  id: string;           // unique identifier
-  label?: string;       // button text
+  id: string;
+  label?: string;
   systemIcon?: string;  // SF Symbol name (e.g. 'plus', 'heart.fill')
   iconColor?: string;   // SF Symbol tint color (hex or RGBA); falls back to system default
   frame: {
@@ -424,11 +353,25 @@ interface ButtonOptions {
     height: number;     // pass equal width and height for a circular button
   };
 }
+
+interface ButtonUpdateOptions {
+  id: string;
+  label?: string;
+  systemIcon?: string;
+  iconColor?: string;
+  frame?: ButtonFrame;  // omit to keep current position
+  element?: Element;
+  minSize?: number;
+  forceSquare?: boolean;
+}
+
+interface ButtonFrame {
+  x: number;      // CSS pixels
+  y: number;
+  width: number;
+  height: number;
+}
 ```
-
-**Supported color formats:** `#RGB`, `#RRGGBB`, `#RRGGBBAA`, `rgba(r,g,b,a)`, `rgb(r,g,b)`. Invalid values fall back silently to the iOS system default tint.
-
-> iOS 26+ uses `UIGlassEffect` for the authentic Liquid Glass appearance. On older iOS versions the button falls back to a `UIBlurEffect` background.
 
 ---
 
@@ -437,3 +380,4 @@ interface ButtonOptions {
 Vitreous is actively extending the original stay-liquid proof-of-concept. More native Liquid Glass components are planned.
 
 Feel free to report bugs, open discussions, or submit pull requests.
+

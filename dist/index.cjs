@@ -202,8 +202,7 @@ var init_web = __esm({
         }).catch((error) => {
           this.loadingStates.set(id, "error");
           console.warn(`TabsBar: Failed to load image for tab ${id}:`, error.message);
-          if (item.systemIcon) {
-          } else {
+          if (!item.systemIcon) {
             console.warn(`TabsBar: No fallback available for tab ${id}`);
           }
         }).finally(() => {
@@ -271,7 +270,8 @@ var init_web2 = __esm({
 var index_exports = {};
 __export(index_exports, {
   Button: () => Button,
-  TabsBar: () => TabsBar
+  TabsBar: () => TabsBar,
+  frameFromElement: () => frameFromElement
 });
 module.exports = __toCommonJS(index_exports);
 
@@ -283,12 +283,52 @@ var TabsBar = (0, import_core2.registerPlugin)("TabsBar", {
 
 // src/components/button/index.ts
 var import_core4 = require("@capacitor/core");
-var Button = (0, import_core4.registerPlugin)("Button", {
+function frameFromElement(el, minSize = 44, forceSquare = false) {
+  const rect = el.getBoundingClientRect();
+  const width = forceSquare ? Math.max(rect.width, rect.height, minSize) : Math.max(rect.width, minSize);
+  const height = forceSquare ? Math.max(rect.width, rect.height, minSize) : Math.max(rect.height, minSize);
+  return {
+    x: rect.x + rect.width / 2 - width / 2,
+    y: rect.y + rect.height / 2 - height / 2,
+    width,
+    height
+  };
+}
+function resolveFrame(options) {
+  if (options.element) return frameFromElement(options.element, options.minSize, options.forceSquare);
+  return options.frame;
+}
+var _native = (0, import_core4.registerPlugin)("Button", {
   web: () => Promise.resolve().then(() => (init_web2(), web_exports2)).then((m) => new m.ButtonWeb())
 });
+function stripExtras(options) {
+  const { element: _e, minSize: _m, forceSquare: _f, ...rest } = options;
+  return rest;
+}
+var Button = {
+  show(options) {
+    const frame = resolveFrame(options);
+    if (!frame) throw new Error("Button.show: provide either frame or element");
+    return _native.show({ ...stripExtras(options), frame });
+  },
+  update(options) {
+    const frame = resolveFrame(options);
+    return _native.update({ ...stripExtras(options), ...frame ? { frame } : {} });
+  },
+  hide(options) {
+    return _native.hide(options);
+  },
+  remove(options) {
+    return _native.remove(options);
+  },
+  addListener(eventName, listenerFunc) {
+    return _native.addListener(eventName, listenerFunc);
+  }
+};
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   Button,
-  TabsBar
+  TabsBar,
+  frameFromElement
 });
 //# sourceMappingURL=index.cjs.map
