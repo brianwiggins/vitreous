@@ -260,7 +260,7 @@ window.addEventListener('scroll', async () => {
 }, { passive: true });
 ```
 
-`update` is a no-op while the button is hidden. Call `update` with correct coordinates before `show` if you need to reposition a hidden button before making it visible again.
+`update` is a no-op while the button is hidden. To reposition a hidden button, call `show` again with the new frame (or element) instead of `update`.
 
 ### Hide and remove
 
