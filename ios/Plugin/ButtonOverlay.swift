@@ -63,7 +63,10 @@ final class ButtonManager: UIViewController {
     }
 
     func update(options: ButtonUpdateOptions) {
-        guard let btn = buttons[options.id] else { return }
+        guard let btn = buttons[options.id] else {
+            print("[Vitreous] Warning: update() called for unknown button id '\(options.id)'")
+            return
+        }
         guard !btn.isHidden else { return }
         btn.applyUpdate(options: options)
     }
