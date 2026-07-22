@@ -181,14 +181,7 @@ export class TabsBarWeb extends WebPlugin implements TabsBarPlugin {
     // Validate and preload images
     await this.validateAndPreloadImages(options.items);
     
-    // Web implementation logs configuration for debugging
-    console.log('TabsBar configured with options:', {
-      itemCount: options.items.length,
-      initialId: options.initialId,
-      visible: options.visible,
-      hasSelectedColor: !!options.selectedIconColor,
-      hasUnselectedColor: !!options.unselectedIconColor
-    });
+    // Web implementation — no-op on non-iOS platforms
   }
   
   private async validateAndPreloadImages(items: TabItem[]): Promise<void> {
@@ -215,7 +208,6 @@ export class TabsBarWeb extends WebPlugin implements TabsBarPlugin {
     const loadPromise = this.loadImageIcon(imageIcon)
       .then(() => {
         this.loadingStates.set(id, 'loaded');
-        console.log(`TabsBar: Successfully loaded image for tab ${id}`);
       })
       .catch((error) => {
         this.loadingStates.set(id, 'error');
@@ -223,7 +215,6 @@ export class TabsBarWeb extends WebPlugin implements TabsBarPlugin {
         
         // Fallback to system icon if available
         if (item.systemIcon) {
-          console.log(`TabsBar: Using systemIcon fallback for tab ${id}: ${item.systemIcon}`);
         } else {
           console.warn(`TabsBar: No fallback available for tab ${id}`);
         }
@@ -256,21 +247,13 @@ export class TabsBarWeb extends WebPlugin implements TabsBarPlugin {
     this.imageLoadPromises.clear();
   }
   
-  async show(): Promise<void> {
-    console.log('TabsBar: show() called');
-  }
+  async show(): Promise<void> {}
   
-  async hide(): Promise<void> {
-    console.log('TabsBar: hide() called');
-  }
+  async hide(): Promise<void> {}
   
-  async select(options: SelectOptions): Promise<void> {
-    console.log('TabsBar: select() called with id:', options.id);
-  }
+  async select(_options: SelectOptions): Promise<void> {}
   
-  async setBadge(options: SetBadgeOptions): Promise<void> {
-    console.log('TabsBar: setBadge() called with:', options);
-  }
+  async setBadge(_options: SetBadgeOptions): Promise<void> {}
   
   async getSafeAreaInsets(): Promise<SafeAreaInsets> {
     return { top: 0, bottom: 0, left: 0, right: 0 };

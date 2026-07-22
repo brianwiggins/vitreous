@@ -2,19 +2,11 @@ import { WebPlugin } from "@capacitor/core";
 import type { ButtonPlugin, ButtonOptions } from "./definitions";
 
 export class ButtonWeb extends WebPlugin implements ButtonPlugin {
-  async show(options: ButtonOptions): Promise<void> {
-    console.log("LiquidButton: show()", options);
-  }
+  async show(_options: ButtonOptions): Promise<void> {}
 
-  async update(options: ButtonOptions): Promise<void> {
-    console.log("LiquidButton: update()", options);
-  }
+  async update(_options: ButtonOptions): Promise<void> {}
 
-  async hide(options: { id: string }): Promise<void> {
-    console.log("LiquidButton: hide()", options.id);
-  }
+  async hide(_options: { id: string }): Promise<void> {}
 
-  async remove(options: { id: string }): Promise<void> {
-    console.log("LiquidButton: remove()", options.id);
-  }
+  async remove(_options: { id: string }): Promise<void> {}
 }

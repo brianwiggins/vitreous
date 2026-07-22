@@ -184,13 +184,6 @@ var init_web = __esm({
           console.warn(`TabsBar: Invalid unselectedIconColor format: ${options.unselectedIconColor}`);
         }
         await this.validateAndPreloadImages(options.items);
-        console.log("TabsBar configured with options:", {
-          itemCount: options.items.length,
-          initialId: options.initialId,
-          visible: options.visible,
-          hasSelectedColor: !!options.selectedIconColor,
-          hasUnselectedColor: !!options.unselectedIconColor
-        });
       }
       async validateAndPreloadImages(items) {
         const imagePromises = items.filter((item) => item.imageIcon).map((item) => this.preloadItemImage(item));
@@ -206,12 +199,10 @@ var init_web = __esm({
         this.loadingStates.set(id, "loading");
         const loadPromise = this.loadImageIcon(imageIcon).then(() => {
           this.loadingStates.set(id, "loaded");
-          console.log(`TabsBar: Successfully loaded image for tab ${id}`);
         }).catch((error) => {
           this.loadingStates.set(id, "error");
           console.warn(`TabsBar: Failed to load image for tab ${id}:`, error.message);
           if (item.systemIcon) {
-            console.log(`TabsBar: Using systemIcon fallback for tab ${id}: ${item.systemIcon}`);
           } else {
             console.warn(`TabsBar: No fallback available for tab ${id}`);
           }
@@ -239,16 +230,12 @@ var init_web = __esm({
         this.imageLoadPromises.clear();
       }
       async show() {
-        console.log("TabsBar: show() called");
       }
       async hide() {
-        console.log("TabsBar: hide() called");
       }
-      async select(options) {
-        console.log("TabsBar: select() called with id:", options.id);
+      async select(_options) {
       }
-      async setBadge(options) {
-        console.log("TabsBar: setBadge() called with:", options);
+      async setBadge(_options) {
       }
       async getSafeAreaInsets() {
         return { top: 0, bottom: 0, left: 0, right: 0 };
@@ -268,17 +255,13 @@ var init_web2 = __esm({
     "use strict";
     import_core3 = require("@capacitor/core");
     ButtonWeb = class extends import_core3.WebPlugin {
-      async show(options) {
-        console.log("LiquidButton: show()", options);
+      async show(_options) {
       }
-      async update(options) {
-        console.log("LiquidButton: update()", options);
+      async update(_options) {
       }
-      async hide(options) {
-        console.log("LiquidButton: hide()", options.id);
+      async hide(_options) {
       }
-      async remove(options) {
-        console.log("LiquidButton: remove()", options.id);
+      async remove(_options) {
       }
     };
   }
