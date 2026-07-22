@@ -9,7 +9,7 @@ export interface ButtonFrame {
   height: number;
 }
 
-export interface ButtonOptions {
+type ButtonOptionsBase = {
   /** Unique identifier for this button */
   id: string;
   /** Text label displayed inside the button */
@@ -18,15 +18,28 @@ export interface ButtonOptions {
   systemIcon?: string;
   /** Tint color for the SF Symbol icon (hex or RGBA format) */
   iconColor?: string;
-  /** Position and size in CSS pixels. Provide either frame or element. */
-  frame?: ButtonFrame;
-  /** DOM element to center the button over. Provide either frame or element. */
-  element?: Element;
-  /** Minimum button size in CSS pixels when deriving frame from element (default: 44) */
-  minSize?: number;
-  /** Force equal width and height (circle). Uses max(width, height, minSize) for both dimensions. */
-  forceSquare?: boolean;
-}
+};
+
+/** ButtonOptions requires exactly one of `frame` or `element` (not both, not neither). */
+export type ButtonOptions = ButtonOptionsBase &
+  (
+    | {
+        /** Position and size in CSS pixels. */
+        frame: ButtonFrame;
+        element?: never;
+        minSize?: never;
+        forceSquare?: never;
+      }
+    | {
+        /** DOM element to center the button over. */
+        element: Element;
+        frame?: never;
+        /** Minimum button size in CSS pixels when deriving frame from element (default: 44) */
+        minSize?: number;
+        /** Force equal width and height (circle). Uses max(width, height, minSize) for both dimensions. */
+        forceSquare?: boolean;
+      }
+  );
 
 /** Options for update() -- all fields except id are optional */
 export interface ButtonUpdateOptions {

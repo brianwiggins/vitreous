@@ -1,7 +1,7 @@
 // src/components/tabs/index.ts
 import { registerPlugin } from "@capacitor/core";
 var TabsBar = registerPlugin("TabsBar", {
-  web: () => import("./web-IPZCEYFC.js").then((m) => new m.TabsBarWeb())
+  web: () => import("./web-DEWZOWAG.js").then((m) => new m.TabsBarWeb())
 });
 
 // src/components/button/index.ts
@@ -22,10 +22,10 @@ function resolveFrame(options) {
   return options.frame;
 }
 var _native = registerPlugin2("Button", {
-  web: () => import("./web-67IZK274.js").then((m) => new m.ButtonWeb())
+  web: () => import("./web-4PNBI5DC.js").then((m) => new m.ButtonWeb())
 });
 function stripExtras(options) {
-  const { element: _e, minSize: _m, ...rest } = options;
+  const { element: _e, minSize: _m, forceSquare: _f, ...rest } = options;
   return rest;
 }
 var Button = {
