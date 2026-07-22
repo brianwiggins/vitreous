@@ -38,11 +38,11 @@ const _native = registerPlugin<ButtonPlugin>("Button", {
   web: () => import("./web").then(m => new m.ButtonWeb()),
 });
 
-function stripExtras<T extends { element?: Element; minSize?: number }>(
+function stripExtras<T extends { element?: Element; minSize?: number; forceSquare?: boolean }>(
   options: T
-): Omit<T, "element" | "minSize"> {
-  const { element: _e, minSize: _m, ...rest } = options as Record<string, unknown>;
-  return rest as Omit<T, "element" | "minSize">;
+): Omit<T, "element" | "minSize" | "forceSquare"> {
+  const { element: _e, minSize: _m, forceSquare: _f, ...rest } = options as Record<string, unknown>;
+  return rest as Omit<T, "element" | "minSize" | "forceSquare">;
 }
 
 export const Button: ButtonPlugin = {

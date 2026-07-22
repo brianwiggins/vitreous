@@ -1,4 +1,4 @@
-﻿# Vitreous: Native Liquid Glass for Ionic & Capacitor Applications
+# Vitreous: Native Liquid Glass for Ionic & Capacitor Applications
 
 Apple's Liquid Glass design language poses a real challenge for Ionic and Capacitor developers. The effect relies on techniques that CSS cannot replicate -- it composites light from the layers physically behind the element in the native render pipeline, not a visual approximation.
 
@@ -193,10 +193,22 @@ import type { PluginListenerHandle } from '@capacitor/core';
 
 ### Show a button
 
-Pass coordinates explicitly, or let the plugin derive them from a DOM element:
+This example is for a circular button.
 
 ```tsx
-// From a DOM element (recommended)
+function frameFor(el: HTMLElement) {
+  const MIN = 44;
+  const rect = el.getBoundingClientRect();
+  // Square frame centered on the element -- prevents a squished/ellipse appearance.
+  const size = Math.max(rect.width, rect.height, MIN);
+  return {
+    x: rect.x + rect.width  / 2 - size / 2,
+    y: rect.y + rect.height / 2 - size / 2,
+    width: size,
+    height: size,
+  };
+}
+
 const el = document.getElementById('my-button')!;
 await Button.show({
   id: 'my-button',
@@ -243,17 +255,12 @@ async ngOnDestroy() {
 All fields except `id` are optional. Omit `frame` to update only visual properties without moving the button:
 
 ```tsx
-// Icon only -- button stays in place
-await Button.update({ id: 'my-button', systemIcon: 'xmark' });
-
-// Re-position from element
-await Button.update({ id: 'my-button', element: el });
-
-// Full update
-await Button.update({ id: 'my-button', systemIcon: 'plus', frame: newFrame });
+window.addEventListener('scroll', async () => {
+  await Button.update({ id: 'my-button', frame: frameFor(el) });
+}, { passive: true });
 ```
 
-`update` is a no-op while the button is hidden. Call `update` with correct coordinates before `show` if you need to reposition a hidden button before making it visible again.
+`update` is a no-op while the button is hidden. To reposition a hidden button, call `show` again with the new frame (or element) instead of `update`.
 
 ### Hide and remove
 
@@ -277,7 +284,56 @@ const frame = frameFromElement(el, 44);
 // Force a square/circle (uses max of width, height, minSize for both dimensions)
 const squareFrame = frameFromElement(el, 44, true);
 
-await Button.show({ id: 'my-button', frame: squareFrame, systemIcon: 'plus' });
+    window.addEventListener('resize', () => void this.showButton());
+  }
+
+  attach(el: HTMLElement): void {
+    const wasEmpty = this.webElements.size === 0;
+    this.webElements.add(el);
+    if (this.ios26) {
+      this.hideWebEl(el);
+      if (wasEmpty && !this.isHiddenRoute(this.router.url)) void this.showButton();
+    }
+  }
+
+  detach(el: HTMLElement): void {
+    this.webElements.delete(el);
+    this.showWebEl(el);
+    if (this.ios26 && this.webElements.size === 0) {
+      void Button.hide({ id: 'my-singleton-button' }).catch(() => {});
+    }
+  }
+
+  private async showButton(): Promise<void> {
+    const frame = this.resolveFrame();
+    if (!frame) return;
+    this.cachedFrame = frame;
+    await Button.show({ id: 'my-singleton-button', systemIcon: 'plus', frame }).catch(() => {});
+  }
+
+  private resolveFrame(): ButtonFrame | null {
+    for (const el of this.webElements) {
+      const rect = el.getBoundingClientRect();
+      if (rect.width > 0 && rect.height > 0) {
+        const size = Math.max(rect.width, rect.height, 44);
+        return {
+          x: rect.x + rect.width  / 2 - size / 2,
+          y: rect.y + rect.height / 2 - size / 2,
+          width: size,
+          height: size,
+        };
+      }
+    }
+    return this.cachedFrame ?? null;
+  }
+
+  private isHiddenRoute(url: string): boolean {
+    return url.startsWith('/register'); // add any other pre-auth or incompatible routes
+  }
+
+  private hideWebEl(el: HTMLElement): void { el.style.opacity = '0'; el.style.pointerEvents = 'none'; }
+  private showWebEl(el: HTMLElement): void { el.style.opacity = ''; el.style.pointerEvents = ''; }
+}
 ```
 
 The frame is centered over the element. `minSize` applies independently to width and height, so a pill element stays pill-shaped unless `forceSquare` is set.
@@ -289,11 +345,13 @@ interface ButtonOptions {
   id: string;
   label?: string;
   systemIcon?: string;  // SF Symbol name (e.g. 'plus', 'heart.fill')
-  iconColor?: string;   // hex or RGBA; falls back to system default
-  frame?: ButtonFrame;  // provide frame or element
-  element?: Element;    // derive frame from this element
-  minSize?: number;     // minimum size when deriving from element (default: 44)
-  forceSquare?: boolean; // use max(width, height, minSize) for both dimensions (circle)
+  iconColor?: string;   // SF Symbol tint color (hex or RGBA); falls back to system default
+  frame: {
+    x: number;          // CSS pixels from getBoundingClientRect
+    y: number;
+    width: number;
+    height: number;     // pass equal width and height for a circular button
+  };
 }
 
 interface ButtonUpdateOptions {

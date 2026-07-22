@@ -63,7 +63,10 @@ final class ButtonManager: UIViewController {
     }
 
     func update(options: ButtonUpdateOptions) {
-        guard let btn = buttons[options.id] else { return }
+        guard let btn = buttons[options.id] else {
+            print("[Vitreous] Warning: update() called for unknown button id '\(options.id)'")
+            return
+        }
         guard !btn.isHidden else { return }
         btn.applyUpdate(options: options)
     }
@@ -186,11 +189,14 @@ final class ButtonView: UIView {
             iconView.image = UIImage(systemName: iconName, withConfiguration: config)
             if iconView.superview == nil { stack.addArrangedSubview(iconView) }
         }
-        if let text = options.label, !text.isEmpty {
-            titleLabel.text = text
-            if titleLabel.superview == nil { stack.addArrangedSubview(titleLabel) }
+        if let text = options.label {
+            if text.isEmpty {
+                titleLabel.removeFromSuperview()
+            } else {
+                titleLabel.text = text
+                if titleLabel.superview == nil { stack.addArrangedSubview(titleLabel) }
+            }
         }
-    }
 
     @objc private func tapped() {
         onTap?()

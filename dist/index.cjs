@@ -302,7 +302,7 @@ var _native = (0, import_core4.registerPlugin)("Button", {
   web: () => Promise.resolve().then(() => (init_web2(), web_exports2)).then((m) => new m.ButtonWeb())
 });
 function stripExtras(options) {
-  const { element: _e, minSize: _m, ...rest } = options;
+  const { element: _e, minSize: _m, forceSquare: _f, ...rest } = options;
   return rest;
 }
 var Button = {
