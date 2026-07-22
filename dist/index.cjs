@@ -270,7 +270,8 @@ var init_web2 = __esm({
 var index_exports = {};
 __export(index_exports, {
   Button: () => Button,
-  TabsBar: () => TabsBar
+  TabsBar: () => TabsBar,
+  frameFromElement: () => frameFromElement
 });
 module.exports = __toCommonJS(index_exports);
 
@@ -327,6 +328,7 @@ var Button = {
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   Button,
-  TabsBar
+  TabsBar,
+  frameFromElement
 });
 //# sourceMappingURL=index.cjs.map

@@ -50,6 +50,7 @@ var Button = {
 };
 export {
   Button,
-  TabsBar
+  TabsBar,
+  frameFromElement
 };
 //# sourceMappingURL=index.js.map

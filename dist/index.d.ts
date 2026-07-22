@@ -134,6 +134,12 @@ interface ButtonPlugin {
     }) => void): Promise<PluginListenerHandle>;
 }
 
+/**
+ * Derives a ButtonFrame from a DOM element.
+ * Preserves the element's aspect ratio (pill, square, etc.).
+ * minSize applies independently to width and height.
+ */
+declare function frameFromElement(el: Element, minSize?: number): ButtonFrame;
 declare const Button: ButtonPlugin;
 
-export { type BadgeValue, Button, type ButtonFrame, type ButtonOptions, type ButtonPlugin, type ButtonUpdateOptions, type SafeAreaInsets, type SelectOptions, type SetBadgeOptions, type TabItem, TabsBar, type TabsBarConfigureOptions, type TabsBarPlugin };
+export { type BadgeValue, Button, type ButtonFrame, type ButtonOptions, type ButtonPlugin, type ButtonUpdateOptions, type SafeAreaInsets, type SelectOptions, type SetBadgeOptions, type TabItem, TabsBar, type TabsBarConfigureOptions, type TabsBarPlugin, frameFromElement };

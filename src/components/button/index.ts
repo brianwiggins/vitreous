@@ -11,9 +11,9 @@ export * from "./definitions";
 /**
  * Derives a ButtonFrame from a DOM element.
  * Preserves the element's aspect ratio (pill, square, etc.).
- * minSize applies independently to width and height so a pill stays a pill.
+ * minSize applies independently to width and height.
  */
-function frameFromElement(el: Element, minSize = 44): ButtonFrame {
+export function frameFromElement(el: Element, minSize = 44): ButtonFrame {
   const rect = el.getBoundingClientRect();
   const width  = Math.max(rect.width,  minSize);
   const height = Math.max(rect.height, minSize);
