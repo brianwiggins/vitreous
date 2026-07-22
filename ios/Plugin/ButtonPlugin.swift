@@ -47,6 +47,7 @@ public class ButtonPlugin: CAPPlugin {
             return
         }
         DispatchQueue.main.async {
+            self.ensureManager()
             self.manager?.update(options: options)
         }
         call.resolve()
