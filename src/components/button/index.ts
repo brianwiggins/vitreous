@@ -13,10 +13,10 @@ export * from "./definitions";
  * Preserves the element's aspect ratio (pill, square, etc.).
  * minSize applies independently to width and height.
  */
-export function frameFromElement(el: Element, minSize = 44): ButtonFrame {
+export function frameFromElement(el: Element, minSize = 44, forceSquare = false): ButtonFrame {
   const rect = el.getBoundingClientRect();
-  const width  = Math.max(rect.width,  minSize);
-  const height = Math.max(rect.height, minSize);
+  const width  = forceSquare ? Math.max(rect.width, rect.height, minSize) : Math.max(rect.width,  minSize);
+  const height = forceSquare ? Math.max(rect.width, rect.height, minSize) : Math.max(rect.height, minSize);
   return {
     x: rect.x + rect.width  / 2 - width  / 2,
     y: rect.y + rect.height / 2 - height / 2,
@@ -26,7 +26,7 @@ export function frameFromElement(el: Element, minSize = 44): ButtonFrame {
 }
 
 function resolveFrame(options: ButtonOptions | ButtonUpdateOptions): ButtonFrame | undefined {
-  if (options.element) return frameFromElement(options.element, options.minSize);
+  if (options.element) return frameFromElement(options.element, options.minSize, options.forceSquare);
   return options.frame;
 }
 

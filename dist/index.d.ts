@@ -100,6 +100,8 @@ interface ButtonOptions {
     element?: Element;
     /** Minimum button size in CSS pixels when deriving frame from element (default: 44) */
     minSize?: number;
+    /** Force equal width and height (circle). Uses max(width, height, minSize) for both dimensions. */
+    forceSquare?: boolean;
 }
 /** Options for update() -- all fields except id are optional */
 interface ButtonUpdateOptions {
@@ -113,6 +115,8 @@ interface ButtonUpdateOptions {
     element?: Element;
     /** Minimum button size when re-deriving frame from element (default: 44) */
     minSize?: number;
+    /** Force equal width and height (circle). Uses max(width, height, minSize) for both dimensions. */
+    forceSquare?: boolean;
 }
 interface ButtonPlugin {
     /** Create and show a new liquid glass button */
@@ -139,7 +143,7 @@ interface ButtonPlugin {
  * Preserves the element's aspect ratio (pill, square, etc.).
  * minSize applies independently to width and height.
  */
-declare function frameFromElement(el: Element, minSize?: number): ButtonFrame;
+declare function frameFromElement(el: Element, minSize?: number, forceSquare?: boolean): ButtonFrame;
 declare const Button: ButtonPlugin;
 
 export { type BadgeValue, Button, type ButtonFrame, type ButtonOptions, type ButtonPlugin, type ButtonUpdateOptions, type SafeAreaInsets, type SelectOptions, type SetBadgeOptions, type TabItem, TabsBar, type TabsBarConfigureOptions, type TabsBarPlugin, frameFromElement };

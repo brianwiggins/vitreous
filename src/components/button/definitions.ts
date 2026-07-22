@@ -24,6 +24,8 @@ export interface ButtonOptions {
   element?: Element;
   /** Minimum button size in CSS pixels when deriving frame from element (default: 44) */
   minSize?: number;
+  /** Force equal width and height (circle). Uses max(width, height, minSize) for both dimensions. */
+  forceSquare?: boolean;
 }
 
 /** Options for update() -- all fields except id are optional */
@@ -38,6 +40,8 @@ export interface ButtonUpdateOptions {
   element?: Element;
   /** Minimum button size when re-deriving frame from element (default: 44) */
   minSize?: number;
+  /** Force equal width and height (circle). Uses max(width, height, minSize) for both dimensions. */
+  forceSquare?: boolean;
 }
 
 export interface ButtonPlugin {

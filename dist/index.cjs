@@ -283,10 +283,10 @@ var TabsBar = (0, import_core2.registerPlugin)("TabsBar", {
 
 // src/components/button/index.ts
 var import_core4 = require("@capacitor/core");
-function frameFromElement(el, minSize = 44) {
+function frameFromElement(el, minSize = 44, forceSquare = false) {
   const rect = el.getBoundingClientRect();
-  const width = Math.max(rect.width, minSize);
-  const height = Math.max(rect.height, minSize);
+  const width = forceSquare ? Math.max(rect.width, rect.height, minSize) : Math.max(rect.width, minSize);
+  const height = forceSquare ? Math.max(rect.width, rect.height, minSize) : Math.max(rect.height, minSize);
   return {
     x: rect.x + rect.width / 2 - width / 2,
     y: rect.y + rect.height / 2 - height / 2,
@@ -295,7 +295,7 @@ function frameFromElement(el, minSize = 44) {
   };
 }
 function resolveFrame(options) {
-  if (options.element) return frameFromElement(options.element, options.minSize);
+  if (options.element) return frameFromElement(options.element, options.minSize, options.forceSquare);
   return options.frame;
 }
 var _native = (0, import_core4.registerPlugin)("Button", {
