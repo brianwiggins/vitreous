@@ -17,5 +17,6 @@ export { Button } from "./components/button";
 export type {
   ButtonPlugin,
   ButtonOptions,
+  ButtonUpdateOptions,
   ButtonFrame
 } from "./components/button/definitions";

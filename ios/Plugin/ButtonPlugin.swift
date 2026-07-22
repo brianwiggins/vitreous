@@ -42,12 +42,12 @@ public class ButtonPlugin: CAPPlugin {
     }
 
     @objc func update(_ call: CAPPluginCall) {
-        guard let options = Self.parseOptions(call) else {
-            call.reject("Missing required fields: id and frame")
+        guard let id = call.getString("id") else {
+            call.reject("Missing 'id'")
             return
         }
+        let options = Self.parseUpdateOptions(id: id, call: call)
         DispatchQueue.main.async {
-            self.ensureManager()
             self.manager?.update(options: options)
         }
         call.resolve()
@@ -91,6 +91,24 @@ public class ButtonPlugin: CAPPlugin {
             systemIcon: call.getString("systemIcon"),
             iconColor: ColorUtils.parseColor(call.getString("iconColor")),
             frame: CGRect(x: x, y: y, width: w, height: h)
+        )
+    }
+
+    private static func parseUpdateOptions(id: String, call: CAPPluginCall) -> ButtonUpdateOptions {
+        var frame: CGRect? = nil
+        if let frameObj = call.getObject("frame"),
+           let x = frameObj["x"] as? Double,
+           let y = frameObj["y"] as? Double,
+           let w = frameObj["width"] as? Double,
+           let h = frameObj["height"] as? Double {
+            frame = CGRect(x: x, y: y, width: w, height: h)
+        }
+        return ButtonUpdateOptions(
+            id: id,
+            label: call.getString("label"),
+            systemIcon: call.getString("systemIcon"),
+            iconColor: ColorUtils.parseColor(call.getString("iconColor")),
+            frame: frame
         )
     }
 }

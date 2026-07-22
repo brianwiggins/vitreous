@@ -18,15 +18,34 @@ export interface ButtonOptions {
   systemIcon?: string;
   /** Tint color for the SF Symbol icon (hex or RGBA format) */
   iconColor?: string;
-  /** Position and size in CSS pixels */
-  frame: ButtonFrame;
+  /** Position and size in CSS pixels. Provide either frame or element. */
+  frame?: ButtonFrame;
+  /** DOM element to center the button over. Provide either frame or element. */
+  element?: Element;
+  /** Minimum button size in CSS pixels when deriving frame from element (default: 44) */
+  minSize?: number;
+}
+
+/** Options for update() -- all fields except id are optional */
+export interface ButtonUpdateOptions {
+  id: string;
+  label?: string;
+  systemIcon?: string;
+  iconColor?: string;
+  /** New frame in CSS pixels. Provide either frame or element, or omit to keep current position. */
+  frame?: ButtonFrame;
+  /** DOM element to re-derive frame from. */
+  element?: Element;
+  /** Minimum button size when re-deriving frame from element (default: 44) */
+  minSize?: number;
 }
 
 export interface ButtonPlugin {
   /** Create and show a new liquid glass button */
   show(options: ButtonOptions): Promise<void>;
-  /** Update the frame, label, or icon of an existing button */
-  update(options: ButtonOptions): Promise<void>;
+  /** Update an existing button. All fields except id are optional;
+   *  omit frame to update only visual properties without moving the button */
+  update(options: ButtonUpdateOptions): Promise<void>;
   /** Hide a button without removing it */
   hide(options: { id: string }): Promise<void>;
   /** Remove a button entirely */
