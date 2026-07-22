@@ -1,4 +1,4 @@
-﻿# Vitreous: Native Liquid Glass for Ionic & Capacitor Applications
+# Vitreous: Native Liquid Glass for Ionic & Capacitor Applications
 
 Apple's Liquid Glass design language poses a real challenge for Ionic and Capacitor developers. The effect relies on techniques that CSS cannot replicate -- it composites light from the layers physically behind the element in the native render pipeline, not a visual approximation.
 
@@ -189,19 +189,19 @@ import { Button } from 'vitreous';
 
 ### Show a button
 
-Enforce a minimum 44x44pt frame (the iOS HIG minimum touch target) centered on the element. Passing a smaller frame produces a visually squeezed button with an off-center icon.
+This example is for a circular button.
 
 ```tsx
 function frameFor(el: HTMLElement) {
   const MIN = 44;
   const rect = el.getBoundingClientRect();
-  const w = Math.max(rect.width, MIN);
-  const h = Math.max(rect.height, MIN);
+  // Square frame centered on the element -- prevents a squished/ellipse appearance.
+  const size = Math.max(rect.width, rect.height, MIN);
   return {
-    x: rect.x - (w - rect.width) / 2,
-    y: rect.y - (h - rect.height) / 2,
-    width: w,
-    height: h,
+    x: rect.x + rect.width  / 2 - size / 2,
+    y: rect.y + rect.height / 2 - size / 2,
+    width: size,
+    height: size,
   };
 }
 
@@ -258,11 +258,7 @@ Call `update` whenever the button moves -- on scroll, layout changes, or keyboar
 
 ```tsx
 window.addEventListener('scroll', async () => {
-  const rect = el.getBoundingClientRect();
-  await Button.update({
-    id: 'my-button',
-    frame: { x: rect.x, y: rect.y, width: rect.width, height: rect.height }
-  });
+  await Button.update({ id: 'my-button', frame: frameFor(el) });
 }, { passive: true });
 ```
 
@@ -361,9 +357,13 @@ export class GlassButtonService {
     for (const el of this.webElements) {
       const rect = el.getBoundingClientRect();
       if (rect.width > 0 && rect.height > 0) {
-        const w = Math.max(rect.width, 44);
-        const h = Math.max(rect.height, 44);
-        return { x: rect.x - (w - rect.width) / 2, y: rect.y - (h - rect.height) / 2, width: w, height: h };
+        const size = Math.max(rect.width, rect.height, 44);
+        return {
+          x: rect.x + rect.width  / 2 - size / 2,
+          y: rect.y + rect.height / 2 - size / 2,
+          width: size,
+          height: size,
+        };
       }
     }
     return this.cachedFrame ?? null;
@@ -421,7 +421,7 @@ interface ButtonOptions {
     x: number;          // CSS pixels from getBoundingClientRect
     y: number;
     width: number;
-    height: number;
+    height: number;     // pass equal width and height for a circular button
   };
 }
 ```
