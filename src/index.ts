@@ -1,6 +1,5 @@
 /**
  * Unified entry for all native overlay components.
- * Currently exports: TabsBar
  */
 
 export { TabsBar } from "./components/tabs";
@@ -13,3 +12,10 @@ export type {
   SelectOptions,
   BadgeValue
 } from "./components/tabs/definitions";
+
+export { Button } from "./components/button";
+export type {
+  ButtonPlugin,
+  ButtonOptions,
+  ButtonFrame
+} from "./components/button/definitions";

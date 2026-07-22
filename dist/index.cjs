@@ -184,13 +184,6 @@ var init_web = __esm({
           console.warn(`TabsBar: Invalid unselectedIconColor format: ${options.unselectedIconColor}`);
         }
         await this.validateAndPreloadImages(options.items);
-        console.log("TabsBar configured with options:", {
-          itemCount: options.items.length,
-          initialId: options.initialId,
-          visible: options.visible,
-          hasSelectedColor: !!options.selectedIconColor,
-          hasUnselectedColor: !!options.unselectedIconColor
-        });
       }
       async validateAndPreloadImages(items) {
         const imagePromises = items.filter((item) => item.imageIcon).map((item) => this.preloadItemImage(item));
@@ -206,12 +199,10 @@ var init_web = __esm({
         this.loadingStates.set(id, "loading");
         const loadPromise = this.loadImageIcon(imageIcon).then(() => {
           this.loadingStates.set(id, "loaded");
-          console.log(`TabsBar: Successfully loaded image for tab ${id}`);
         }).catch((error) => {
           this.loadingStates.set(id, "error");
           console.warn(`TabsBar: Failed to load image for tab ${id}:`, error.message);
           if (item.systemIcon) {
-            console.log(`TabsBar: Using systemIcon fallback for tab ${id}: ${item.systemIcon}`);
           } else {
             console.warn(`TabsBar: No fallback available for tab ${id}`);
           }
@@ -239,16 +230,12 @@ var init_web = __esm({
         this.imageLoadPromises.clear();
       }
       async show() {
-        console.log("TabsBar: show() called");
       }
       async hide() {
-        console.log("TabsBar: hide() called");
       }
-      async select(options) {
-        console.log("TabsBar: select() called with id:", options.id);
+      async select(_options) {
       }
-      async setBadge(options) {
-        console.log("TabsBar: setBadge() called with:", options);
+      async setBadge(_options) {
       }
       async getSafeAreaInsets() {
         return { top: 0, bottom: 0, left: 0, right: 0 };
@@ -257,9 +244,33 @@ var init_web = __esm({
   }
 });
 
+// src/components/button/web.ts
+var web_exports2 = {};
+__export(web_exports2, {
+  ButtonWeb: () => ButtonWeb
+});
+var import_core3, ButtonWeb;
+var init_web2 = __esm({
+  "src/components/button/web.ts"() {
+    "use strict";
+    import_core3 = require("@capacitor/core");
+    ButtonWeb = class extends import_core3.WebPlugin {
+      async show(_options) {
+      }
+      async update(_options) {
+      }
+      async hide(_options) {
+      }
+      async remove(_options) {
+      }
+    };
+  }
+});
+
 // src/index.ts
 var index_exports = {};
 __export(index_exports, {
+  Button: () => Button,
   TabsBar: () => TabsBar
 });
 module.exports = __toCommonJS(index_exports);
@@ -269,8 +280,15 @@ var import_core2 = require("@capacitor/core");
 var TabsBar = (0, import_core2.registerPlugin)("TabsBar", {
   web: () => Promise.resolve().then(() => (init_web(), web_exports)).then((m) => new m.TabsBarWeb())
 });
+
+// src/components/button/index.ts
+var import_core4 = require("@capacitor/core");
+var Button = (0, import_core4.registerPlugin)("Button", {
+  web: () => Promise.resolve().then(() => (init_web2(), web_exports2)).then((m) => new m.ButtonWeb())
+});
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
+  Button,
   TabsBar
 });
 //# sourceMappingURL=index.cjs.map
