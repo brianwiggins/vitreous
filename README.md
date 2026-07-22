@@ -271,11 +271,16 @@ Calling `show` on a hidden button re-shows it with the provided frame and option
 ```tsx
 import { frameFromElement } from 'vitreous';
 
-const frame = frameFromElement(el, 44); // el: Element, minSize: number (default 44)
-await Button.show({ id: 'my-button', frame, systemIcon: 'plus' });
+// Preserve element aspect ratio (pill stays pill)
+const frame = frameFromElement(el, 44);
+
+// Force a square/circle (uses max of width, height, minSize for both dimensions)
+const squareFrame = frameFromElement(el, 44, true);
+
+await Button.show({ id: 'my-button', frame: squareFrame, systemIcon: 'plus' });
 ```
 
-The frame is centered over the element. `minSize` applies independently to width and height, so a pill element stays pill-shaped.
+The frame is centered over the element. `minSize` applies independently to width and height, so a pill element stays pill-shaped unless `forceSquare` is set.
 
 ### API reference
 
@@ -288,6 +293,7 @@ interface ButtonOptions {
   frame?: ButtonFrame;  // provide frame or element
   element?: Element;    // derive frame from this element
   minSize?: number;     // minimum size when deriving from element (default: 44)
+  forceSquare?: boolean; // use max(width, height, minSize) for both dimensions (circle)
 }
 
 interface ButtonUpdateOptions {
@@ -298,6 +304,7 @@ interface ButtonUpdateOptions {
   frame?: ButtonFrame;  // omit to keep current position
   element?: Element;
   minSize?: number;
+  forceSquare?: boolean;
 }
 
 interface ButtonFrame {
@@ -315,3 +322,4 @@ interface ButtonFrame {
 Vitreous is actively extending the original stay-liquid proof-of-concept. More native Liquid Glass components are planned.
 
 Feel free to report bugs, open discussions, or submit pull requests.
+
