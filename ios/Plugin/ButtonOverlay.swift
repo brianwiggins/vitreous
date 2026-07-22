@@ -186,11 +186,14 @@ final class ButtonView: UIView {
             iconView.image = UIImage(systemName: iconName, withConfiguration: config)
             if iconView.superview == nil { stack.addArrangedSubview(iconView) }
         }
-        if let text = options.label, !text.isEmpty {
-            titleLabel.text = text
-            if titleLabel.superview == nil { stack.addArrangedSubview(titleLabel) }
+        if let text = options.label {
+            if text.isEmpty {
+                titleLabel.removeFromSuperview()
+            } else {
+                titleLabel.text = text
+                if titleLabel.superview == nil { stack.addArrangedSubview(titleLabel) }
+            }
         }
-    }
 
     @objc private func tapped() {
         onTap?()
