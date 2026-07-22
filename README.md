@@ -20,38 +20,7 @@ Then sync it to your Ionic or Capacitor build:
 ionic cap sync ios
 ```
 
-## Tab Bar
-
-### Import
-
-```tsx
-import { Device, DeviceInfo } from '@capacitor/device';
-import { TabsBar } from 'vitreous';
-import { filter, Subscription } from 'rxjs';
-import { Router, NavigationEnd } from '@angular/router';
-```
-
-# Vitreous: Native Liquid Glass for Ionic & Capacitor Applications
-
-Apple's Liquid Glass design language poses a real challenge for Ionic and Capacitor developers. The effect relies on techniques that CSS cannot replicate -- it composites light from the layers physically behind the element in the native render pipeline, not a visual approximation.
-
-Vitreous solves this by rendering true native Liquid Glass components as overlays on top of Ionic's WKWebView. You call the plugin from TypeScript or JavaScript, and when a native component fires an event it is passed back to Ionic for you to handle. No Swift required in your project.
-
-Vitreous is a fork of [stay-liquid](https://github.com/alistairheath/stay-liquid), extended with additional components and capabilities. The tab navigation bar and native buttons are currently available, with more planned.
-
-## Installation
-
-Install directly from GitHub using npm:
-
-```powershell
-npm i https://github.com/brianwiggins/vitreous
-```
-
-Then sync it to your Ionic or Capacitor build:
-
-```powershell
-ionic cap sync ios
-```
+---
 
 ## Tab Bar
 
@@ -186,6 +155,8 @@ await TabsBar.configure({
 
 Remote images are cached for 24 hours. Loading is asynchronous -- the `systemIcon` fallback displays until the image is ready.
 
+---
+
 ## Buttons
 
 `Button` renders a native Liquid Glass button on top of the WKWebView at coordinates you provide. Only buttons you explicitly register are affected -- nothing in your project changes automatically.
@@ -208,6 +179,7 @@ await Button.show({
   id: 'my-button',
   label: 'Add',
   systemIcon: 'plus',
+  iconColor: '#007AFF',
   frame: { x: rect.x, y: rect.y, width: rect.width, height: rect.height }
 });
 
@@ -217,17 +189,27 @@ el.style.visibility = 'hidden';
 
 ### Listen for taps
 
+Store the returned handle so you can clean up on destroy:
+
 ```tsx
-await Button.addListener('tapped', ({ id }) => {
-  if (id === 'my-button') {
-    // handle tap
-  }
-});
+private buttonListener?: PluginListenerHandle;
+
+async ngOnInit() {
+  this.buttonListener = await Button.addListener('tapped', ({ id }) => {
+    if (id === 'my-button') {
+      // handle tap
+    }
+  });
+}
+
+async ngOnDestroy() {
+  await this.buttonListener?.remove();
+}
 ```
 
 ### Update position
-Call `update` whenever the button moves -- on scroll, layout changes, or keyboard appearance. `update` is a no-op while the button is hidden, so mid-animation coordinate changes will not cause the button to flash at a wrong position.
-Call `update` whenever the button moves -- on scroll, layout changes, or keyboard appearance:
+
+Call `update` whenever the button moves -- on scroll, layout changes, or keyboard appearance. `update` is a no-op while the button is hidden, so mid-animation coordinate changes will not cause a hidden button to flash at wrong coordinates.
 
 ```tsx
 window.addEventListener('scroll', async () => {
@@ -239,8 +221,7 @@ window.addEventListener('scroll', async () => {
 });
 ```
 
-Call `update` with the correct coordinates before `show` if you need to reposition a hidden button before making it visible again.
-
+Call `update` with correct coordinates before calling `show` if you need to reposition a hidden button before making it visible again.
 
 ### Hide and remove
 
@@ -256,6 +237,7 @@ interface ButtonOptions {
   id: string;           // unique identifier
   label?: string;       // button text
   systemIcon?: string;  // SF Symbol name (e.g. 'plus', 'heart.fill')
+  iconColor?: string;   // SF Symbol tint color (hex or RGBA); falls back to system default
   frame: {
     x: number;          // CSS pixels from getBoundingClientRect
     y: number;
@@ -265,78 +247,14 @@ interface ButtonOptions {
 }
 ```
 
+**Supported color formats:** `#RGB`, `#RRGGBB`, `#RRGGBBAA`, `rgba(r,g,b,a)`, `rgb(r,g,b)`. Invalid values fall back silently to the iOS system default tint.
+
 > iOS 26+ uses `UIGlassEffect` for the authentic Liquid Glass appearance. On older iOS versions the button falls back to a `UIBlurEffect` background.
+
+---
 
 ## Roadmap & Contributing
 
 Vitreous is actively extending the original stay-liquid proof-of-concept. More native Liquid Glass components are planned.
 
 Feel free to report bugs, open discussions, or submit pull requests.
-
-
-> You will need to build and run with iOS 26+ from Xcode for the native tab bar to be visible.
-
-If you use Ionic tabs for other platforms, hide them on iOS 26+ using the `useNativeTabs` flag:
-
-```html
-<ion-tabs [class.hidden]="useNativeTabs">
-  <!-- tabs content -->
-</ion-tabs>
-```
-
-### Color Customization
-
-Specify custom colors for selected and unselected tab icon states using hex or RGBA formats.
-
-**Supported formats**
-- Hex: `#FF5733`, `#F57` (3-digit shorthand), `#FF5733FF` (with alpha)
-- RGBA: `rgba(255, 87, 51, 1.0)`, `rgb(255, 87, 51)`
-
-```tsx
-await TabsBar.configure({
-  items: [...],
-  selectedIconColor: '#007AFF',
-  unselectedIconColor: 'rgba(142, 142, 147, 0.6)',
-});
-```
-
-Invalid color values log a warning and fall back to iOS system defaults.
-
-### Image Icons
-
-The `imageIcon` property lets you use custom images -- remote URLs or base64 data URIs -- in place of SF Symbols.
-
-```tsx
-interface ImageIcon {
-  shape: 'circle' | 'square';          // icon container shape
-  size:  'cover'  | 'fit' | 'stretch'; // image scaling behaviour
-  image: string;                       // base64 data URI or HTTPS URL
-  ring?: {
-    enabled: boolean;
-    width?: number; // ring width in points, default 2.0
-  };
-}
-```
-
-| Property | Value     | Description                                  |
-|----------|-----------|----------------------------------------------|
-| `shape`  | `circle`  | Circular container                           |
-| `shape`  | `square`  | Square container                             |
-| `size`   | `cover`   | Aspect fill -- crops to fill container       |
-| `size`   | `fit`     | Aspect fit -- scales to fit within container |
-| `size`   | `stretch` | Stretches to fill exactly (may distort)      |
-
-```tsx
-await TabsBar.configure({
-  items: [{
-    id: 'profile', title: 'Profile', systemIcon: 'person',
-    imageIcon: { shape: 'circle', size: 'fit', image: 'https://example.com/avatar.png' }
-  }]
-});
-```
-
-**Supported formats:** PNG, JPEG, SVG, WebP. Remote images must use HTTPS and be under 5 MB.
-
-**Fallback chain:** `imageIcon` -> `systemIcon` (SF Symbol) -> `image` (bundled asset) -> empty placeholder
-
-Remote images are cached for 24 hours. Loading is asynchronous -- the `systemIcon` fallback displays until the image is ready.

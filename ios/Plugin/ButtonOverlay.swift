@@ -126,10 +126,14 @@ final class ButtonView: UIView {
         effectView.layer.cornerRadius = bounds.height / 2
 
         // Icon
-        if let iconName = options.systemIcon,
-           let image = UIImage(systemName: iconName) {
-            iconView.image = image
-            iconView.tintColor = options.iconColor ?? .label
+        if let iconName = options.systemIcon {
+            let config: UIImage.SymbolConfiguration
+            if let color = options.iconColor {
+                config = UIImage.SymbolConfiguration(hierarchicalColor: color)
+            } else {
+                config = UIImage.SymbolConfiguration(scale: .medium)
+            }
+            iconView.image = UIImage(systemName: iconName, withConfiguration: config)
             if iconView.superview == nil { stack.addArrangedSubview(iconView) }
         } else {
             iconView.removeFromSuperview()
